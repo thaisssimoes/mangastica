@@ -13,7 +13,7 @@ func GetMangaList(g *gin.Context) {
 	var mangaList []model.Manga
 	var manga model.Manga
 
-	mangas, err := Utils.GetDirectoryList("")
+	mangas, err := Utils.GetFileList("")
 	if err != nil {
 		g.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error()})
@@ -33,8 +33,8 @@ func GetChapterList(g *gin.Context) {
 	var chapterList []int
 	mangaName := g.Params.ByName("title")
 
-	path := fmt.Sprintf("/%s", mangaName)
-	chapters, err := Utils.GetDirectoryList(path)
+	path := fmt.Sprintf("/img/%s", mangaName)
+	chapters, err := Utils.GetFileList(path)
 	if err != nil {
 		g.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error()})
