@@ -1,9 +1,12 @@
 package Utils
 
 import (
+	"archive/zip"
 	"fmt"
+	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -17,7 +20,6 @@ func GetFileList(path string) ([]os.DirEntry, error) {
 	return entries, nil
 }
 
-// Pegar o nome do mangá no nome do arquivo
 func GetFilePart(directory, cleaner string) ([]string, error) {
 	var partList []string
 	filesList, err := GetFileList(directory)
@@ -26,20 +28,34 @@ func GetFilePart(directory, cleaner string) ([]string, error) {
 	}
 
 	for _, fileName := range filesList {
-		file := regexGetBeforeExpression(fileName.Name(), cleaner)
+		file, err := regexGetBeforeExpression(fileName.Name(), cleaner)
+		if err != nil {
+			return nil, err
+		}
 		partList = append(partList, file)
 	}
 	return partList, nil
 }
 
-func regexGetBeforeExpression(expression, cleaner string) string {
-	cleanExpression := regexp.MustCompile(fmt.Sprintf((`^[^%s]+`), cleaner)).FindString(expression)
-	return cleanExpression
+func regexGetBeforeExpression(expression, delimiter string) (string, error) {
+	cleanExpression := regexp.MustCompile(fmt.Sprintf((`^[^%s]+`), delimiter)).FindString(expression)
+	if cleanExpression == "" {
+		return "", fmt.Errorf("Uncapable of finding expression")
+	}
+	return cleanExpression, nil
 }
 
-// Cria diretório de mangá pelo nome do arquivo
-func CreateMangaDirectoryByName(path string) {
+// Para pegar numero de capítulo e volume
+func regexGetBetweenExpression(leftDelimiter, rightDelimiter, str string) (string, error) {
+	r := regexp.MustCompile(`(?s)` + regexp.QuoteMeta(leftDelimiter) + `(.*?)` + regexp.QuoteMeta(rightDelimiter))
+	matches := r.FindAllStringSubmatch(str, -1)
+	for _, v := range matches {
+		return v[1], nil
+	}
+	return "", fmt.Errorf("Uncapable of finding expression")
+}
 
+func CreateMangaDirectoryByName(path string) {
 	fileList, err := GetFilePart("/mangas", "(")
 	if err != nil {
 		log.Println(err)
@@ -66,8 +82,47 @@ func createDirectory(path string) {
 }
 
 // TODO
-func GetChapterIdFromFile()          {} //Pegar o capitulo no nome do arquivo
-func GetListChaptersFromManga()      {} //Pegar a lista de capitulos por mangá
-func CreateChaptersDirectoryByName() {} //Cria diretórios de capitulos de cada mangá
-func GetListPagesChapter()           {} //Pegar a lista de páginas por capítulos
-func DecompressMangaFile()           {} //Descomprimir arquivos .cbz
+func GetChapterIdFromFile()        {} //Pegar o capitulo no nome do arquivo
+func GetListChaptersFromManga()    {} //Pegar a lista de capitulos por mangá
+func CreateChaptersDirectoryById() {} //Cria diretórios de capitulos de cada mangá
+func GetListPagesChapter()         {} //Pegar a lista de páginas por capítulos
+
+// Descomprimir arquivos .cbz
+func DecompressMangaFile(path, fileDestinationFolder string) {
+	//The first thing is to open the zipped file.
+	openedFile, err := zip.OpenReader(path)
+	if err != nil {
+		panic(err)
+	}
+	// postpone the closing of the file.
+	defer openedFile.Close()
+
+	for _, file := range openedFile.File {
+		filePath := filepath.Join(fileDestinationFolder, file.Name)
+		fmt.Println("unzipping file", filePath)
+		// if the file is an empty directory, create a directory
+		if file.FileInfo().IsDir() {
+			// create the directory
+			os.MkdirAll(fileDestinationFolder, os.ModePerm)
+			continue
+		}
+		if err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
+			panic(err)
+		} else {
+			destinationFile, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, file.Mode())
+			if err != nil {
+				panic(err)
+			}
+			//Opening the file and copy it's contents
+			fileInArchive, err := file.Open()
+			if err != nil {
+			}
+			if _, err := io.Copy(destinationFile, fileInArchive); err != nil {
+				panic(err)
+			}
+			destinationFile.Close()
+			fileInArchive.Close()
+		}
+
+	}
+}
