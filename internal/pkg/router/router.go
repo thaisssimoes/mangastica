@@ -1,7 +1,7 @@
 package router
 
 import (
-	"Mangastica-server/pkg/service"
+	"Mangastica-server/internal/pkg/service"
 	"github.com/gin-gonic/gin"
 )
 

@@ -1,8 +1,8 @@
 package service
 
 import (
-	"Mangastica-server/pkg/Utils"
-	"Mangastica-server/pkg/model"
+	"Mangastica-server/internal/pkg/files"
+	"Mangastica-server/internal/pkg/model"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -13,7 +13,7 @@ func GetMangaList(g *gin.Context) {
 	var mangaList []model.Manga
 	var manga model.Manga
 
-	mangas, err := Utils.GetFileList("")
+	mangas, err := files.GetFileList("")
 	if err != nil {
 		g.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error()})
@@ -34,7 +34,7 @@ func GetChapterList(g *gin.Context) {
 	mangaName := g.Params.ByName("title")
 
 	path := fmt.Sprintf("/img/%s", mangaName)
-	chapters, err := Utils.GetFileList(path)
+	chapters, err := files.GetFileList(path)
 	if err != nil {
 		g.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error()})

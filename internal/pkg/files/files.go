@@ -1,4 +1,4 @@
-package Utils
+package files
 
 import (
 	"archive/zip"
@@ -88,9 +88,9 @@ func CreateChaptersDirectoryById() {} //Cria diretórios de capitulos de cada ma
 func GetListPagesChapter()         {} //Pegar a lista de páginas por capítulos
 
 // Descomprimir arquivos .cbz
-func DecompressMangaFile(path, fileDestinationFolder string) {
+func DecompressMangaFile(zipFilePath, fileDestinationFolder string) {
 	//The first thing is to open the zipped file.
-	openedFile, err := zip.OpenReader(path)
+	openedFile, err := zip.OpenReader(zipFilePath)
 	if err != nil {
 		panic(err)
 	}
@@ -100,29 +100,19 @@ func DecompressMangaFile(path, fileDestinationFolder string) {
 	for _, file := range openedFile.File {
 		filePath := filepath.Join(fileDestinationFolder, file.Name)
 		fmt.Println("unzipping file", filePath)
-		// if the file is an empty directory, create a directory
-		if file.FileInfo().IsDir() {
-			// create the directory
-			os.MkdirAll(fileDestinationFolder, os.ModePerm)
-			continue
-		}
-		if err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
-			panic(err)
-		} else {
-			destinationFile, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, file.Mode())
-			if err != nil {
-				panic(err)
-			}
-			//Opening the file and copy it's contents
-			fileInArchive, err := file.Open()
-			if err != nil {
-			}
-			if _, err := io.Copy(destinationFile, fileInArchive); err != nil {
-				panic(err)
-			}
-			destinationFile.Close()
-			fileInArchive.Close()
-		}
 
+		destinationFile, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, file.Mode())
+		if err != nil {
+			panic(err)
+		}
+		//Opening the file and copy it's contents
+		fileInArchive, err := file.Open()
+		if err != nil {
+		}
+		if _, err := io.Copy(destinationFile, fileInArchive); err != nil {
+			panic(err)
+		}
+		destinationFile.Close()
+		fileInArchive.Close()
 	}
 }
