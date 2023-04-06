@@ -1,13 +1,9 @@
 package main
 
-import "Mangastica-server/pkg/files"
-
 func main() {
-	path := "Static"
+	//path := "Static"
 
-	files.UnzipManga(path)
+	//files.UnzipAllMangas(path)
 	//router.HandleRequest()
-
-	//files.CreateMangaDirectoryByName("./Static/mangas/")
 
 }

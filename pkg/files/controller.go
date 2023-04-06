@@ -17,7 +17,7 @@ type File struct {
 
 //fileDestinationFolder PRECISA já ter o nome do mangá
 
-func UnzipManga(rootPath string) {
+func UnzipAllMangas(rootPath string) {
 
 	var newPath, mangaName, newMangaName string
 	newMangaName = ""
