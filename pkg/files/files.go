@@ -46,7 +46,6 @@ func DigitBetween(s string) string {
 	return s
 }
 
-// Para pegar numero de capítulo e volume
 func regexGetBetweenExpression(leftDelimiter, rightDelimiter, str string) (string, error) {
 	r := regexp.MustCompile(`(?s)` + regexp.QuoteMeta(leftDelimiter) + `(.*?)` + regexp.QuoteMeta(rightDelimiter))
 	matches := r.FindAllStringSubmatch(str, -1)
@@ -56,21 +55,6 @@ func regexGetBetweenExpression(leftDelimiter, rightDelimiter, str string) (strin
 	return "", fmt.Errorf("Uncapable of finding expression")
 }
 
-//func CreateMangaDirectoryByName(path string) {
-//	fileList, err := GetFileNamePart("/zips", "(")
-//	if err != nil {
-//		log.Println(err)
-//		return
-//	}
-//
-//	for _, fileName := range fileList {
-//		strings.Trim(fileName, fileName)
-//		completedPath := fmt.Sprintf("%s%s", path, fileName)
-//		createDirectory(completedPath)
-//
-//	}
-//}
-
 func createDirectory(path string) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		err := os.Mkdir(path, os.ModePerm)
@@ -79,6 +63,3 @@ func createDirectory(path string) {
 		}
 	}
 }
-
-// TODO
-func GetChapterIdFromFile() {} //Pegar o capitulo no nome do arquivo

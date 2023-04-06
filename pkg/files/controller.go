@@ -15,8 +15,6 @@ type File struct {
 	ZipsPath        []string
 }
 
-//fileDestinationFolder PRECISA já ter o nome do mangá
-
 func UnzipAllMangas(rootPath string) {
 
 	var newPath, mangaName, newMangaName string
@@ -43,12 +41,10 @@ func UnzipAllMangas(rootPath string) {
 			newMangaName = strings.Trim(mangaName, " ")
 		}
 
-		if chapterNumber == "" {
-			newMangaFolder = filepath.Join(rootPath, "mangas", newMangaName)
-			createDirectory(newMangaFolder)
-		} else {
-			newMangaFolder = filepath.Join(rootPath, "mangas", newMangaName)
-			createDirectory(newMangaFolder)
+		newMangaFolder = filepath.Join(rootPath, "mangas", newMangaName)
+		createDirectory(newMangaFolder)
+
+		if chapterNumber != "" {
 			newMangaFolder = filepath.Join(rootPath, "mangas", newMangaName, chapterNumber)
 			createDirectory(newMangaFolder)
 			chapterNumber = ""
